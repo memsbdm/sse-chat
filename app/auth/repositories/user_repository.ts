@@ -1,4 +1,5 @@
 import User from '#auth/models/user'
+import { StoreUserDto } from '#auth/controllers/register_controller'
 
 export class UserRepository {
   async verifyCredentials(uid: string, password: string) {
@@ -8,5 +9,9 @@ export class UserRepository {
     } catch (e) {
       return null
     }
+  }
+
+  store(user: StoreUserDto) {
+    return User.create(user)
   }
 }
