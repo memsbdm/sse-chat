@@ -5,12 +5,12 @@
   export let errors: Record<string, string> = {}
 
   let data = {
-    email: null,
+    uid: null,
     password: null
   }
 
   function handleSubmit(){
-    router.visit('/auth/login', {method: 'post'}, data)
+    router.visit('/auth/login', {method: 'post', data: data})
   }
 </script>
 
@@ -25,7 +25,7 @@
     {#if errors.auth}
       <small>{errors.auth}</small>
     {/if}
-    <input type="email" id="email" placeholder="email" bind:value={data.email} />
+    <input type="text" id="uid" placeholder="email or username" bind:value={data.uid} />
     <input type="password" id="password" placeholder="password" bind:value={data.password} />
     <button type="submit">Login</button>
   </form>

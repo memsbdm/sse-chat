@@ -5,7 +5,7 @@ import { UserRepository } from '#auth/repositories/user_repository'
 export class AuthService {
   constructor(private repository: UserRepository) {}
 
-  async attempt(email: string, password: string) {
-    return this.repository.verifyCredentials(email, password)
+  async attempt(uid: string, password: string) {
+    return this.repository.verifyCredentials(uid, password)
   }
 }

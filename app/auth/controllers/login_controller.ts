@@ -11,8 +11,8 @@ export default class LoginController {
   }
 
   async handle({ auth, request, response, session }: HttpContext) {
-    const { email, password } = request.all()
-    const user = await this.authService.attempt(email, password)
+    const { uid, password } = request.all()
+    const user = await this.authService.attempt(uid, password)
 
     if (!user) {
       session.flash('errors.auth', 'Invalid credentials')
