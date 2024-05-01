@@ -1,5 +1,5 @@
-<script>
-export let version
+<script lang="ts">
+export let version: number
 </script>
 
 <svelte:head>
