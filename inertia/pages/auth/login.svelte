@@ -20,7 +20,7 @@
 </svelte:head>
 
 <div class="container">
-  <h1>Welcome back!</h1>
+  <h1 class="title">Welcome back!</h1>
   <form on:submit|preventDefault={handleSubmit}>
     {#if errors.auth}
       <small>{errors.auth}</small>

@@ -1,10 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { AuthService } from '#auth/services/auth_service'
 import { inject } from '@adonisjs/core'
+import { SseService } from '#core/services/sse_service'
 
 @inject()
 export default class LoginController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private sseService: SseService
+  ) {}
 
   render({ inertia }: HttpContext) {
     return inertia.render('auth/login')
@@ -22,6 +26,10 @@ export default class LoginController {
 
     await auth.use('web').login(user)
 
-    return response.redirect().toPath('/')
+    const token = await this.sseService.computeToken({
+      mercure: { subscribe: ['/chat'] },
+    })
+
+    return response.plainCookie('sseAuthorization', token, { encode: false }).redirect().toPath('/')
   }
 }

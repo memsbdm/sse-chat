@@ -1,6 +1,6 @@
 <script lang="ts">
   // @ts-ignore
-  import { router } from '@inertiajs/svelte'
+  import { inertia, router } from '@inertiajs/svelte'
   export let version: number
 
   function handleSubmit(){
@@ -19,6 +19,8 @@
     Learn more about AdonisJS and Inertia.js by visiting the
     <a href="https://docs.adonisjs.com/guides/inertia">AdonisJS documentation</a>.
   </span>
+
+  <a href="/chatroom" use:inertia>Join Chat Room</a>
   <form on:submit|preventDefault={handleSubmit}>
     <button type="submit">Logout</button>
   </form>

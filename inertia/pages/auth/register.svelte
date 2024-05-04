@@ -21,7 +21,7 @@
   <title>Register</title>
 </svelte:head>
 <div class="container">
-  <h1>Join Us!</h1>
+  <h1 class="title">Join Us!</h1>
   <form on:submit|preventDefault={handleSubmit}>
     <input type="text" id="username" bind:value={data.username} placeholder="username" />
     {#if errors.username}<small>{errors.username}</small>{/if}
