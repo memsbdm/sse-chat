@@ -9,6 +9,8 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+const JoinChatController = () => import('#chat/controllers/join_chat_controller')
+const LeaveChatController = () => import('#chat/controllers/leave_chat_controller')
 const StoreChatController = () => import('#chat/controllers/store_chat_controller')
 const ListChatsController = () => import('#chat/controllers/list_chats_controller')
 const LogoutController = () => import('#auth/controllers/logout_controller')
@@ -41,5 +43,7 @@ router
     router.get('/chatroom', [ListChatsController, 'render'])
     router.post('/fetch', [ListChatsController])
     router.post('/chat', [StoreChatController])
+    router.get('/join', [JoinChatController])
+    router.get('/leave', [LeaveChatController])
   })
   .middleware(middleware.auth())

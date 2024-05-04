@@ -33,13 +33,21 @@
       else if (data.eventType === 'info'){
         addInfo(data)
       }
+      chatbox.scrollTop = chatbox.scrollHeight
     }
 
+    eventSource.onopen = () => {
+      router.get('/join')
+    }
+
+
     window.addEventListener('beforeunload', async () => {
+      router.get('/leave')
       eventSource.close()
     })
 
     return () => {
+      router.get('/leave')
       eventSource.close()
     }
   })
@@ -57,9 +65,16 @@
     p.appendChild(b)
     p.appendChild(span)
     newChats.appendChild(p)
-    chatbox.scrollTop = chatbox.scrollHeight
   }
-  function addInfo(data: Record<string, string>){}
+  function addInfo(data: Record<string, string>){
+    const em = document.createElement('em')
+    if(data.eventDetail === 'join')
+      em.textContent = data.username + ' has joined the chat'
+    else if (data.eventDetail === 'leave')
+      em.textContent = data.username + ' has left the chat'
+
+    newChats.appendChild(em)
+  }
 
   async function fetchMessages (){
     const response = await fetch('/fetch', {
@@ -133,7 +148,7 @@
     flex-direction: column;
     height: 40vh;
     width: min(80vw, 600px);
-    border: 1px solid red;
+    border: 1px solid black;
     overflow: scroll;
     padding: 1rem;
   }
@@ -156,8 +171,9 @@
     margin-top: .2rem;
   }
 
-  em{
+  :global(em){
     text-align: center;
+    display: block;
   }
 
   input{
