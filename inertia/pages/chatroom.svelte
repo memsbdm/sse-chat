@@ -3,18 +3,63 @@
   import { inertia, router } from '@inertiajs/svelte'
   import { onMount } from "svelte";
   import type Chat from "#chat/models/chat";
+  import { MERCURE_URL } from "#core/constants/constants";
 
   let chatbox: HTMLElement
-  let old: HTMLDivElement
+  let oldChats: HTMLDivElement
+  let newChats: HTMLDivElement
   let page = 1
   let ignoredMessages: string[] = []
   let lastPage: null | number = null
   let isFetching = false
+  let message = ''
 
-  onMount(async () => {
-    await handleScrollFetch()
-    chatbox.scrollTop = chatbox.scrollHeight
+  onMount(() => {
+    const url = new URL(MERCURE_URL)
+    url.searchParams.append('topic', '/chat')
+    const eventSource = new EventSource(url, { withCredentials: true })
+    ;(async () => {
+      await handleScrollFetch()
+      chatbox.scrollTop = chatbox.scrollHeight
+    })()
+
+    eventSource.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+
+      if(data.eventType === 'message'){
+        addMessage(data)
+      }
+
+      else if (data.eventType === 'info'){
+        addInfo(data)
+      }
+    }
+
+    window.addEventListener('beforeunload', async () => {
+      eventSource.close()
+    })
+
+    return () => {
+      eventSource.close()
+    }
   })
+
+  function addMessage(data: Record<string, string>){
+    const small = document.createElement('small')
+    const createdAt = new Date(data.createdAt.toString())
+    small.textContent = createdAt.toLocaleString()
+    const p = document.createElement('p')
+    const span = document.createElement('span')
+    const b = document.createElement('b')
+    b.textContent = data.username
+    span.textContent = data.message
+    p.appendChild(small)
+    p.appendChild(b)
+    p.appendChild(span)
+    newChats.appendChild(p)
+    chatbox.scrollTop = chatbox.scrollHeight
+  }
+  function addInfo(data: Record<string, string>){}
 
   async function fetchMessages (){
     const response = await fetch('/fetch', {
@@ -44,16 +89,22 @@
       p.appendChild(small)
       p.appendChild(b)
       p.appendChild(span)
-      old.appendChild(p)
+      oldChats.appendChild(p)
     })
   }
 
   async function handleScrollFetch(){
-    if(isFetching || (lastPage && page > lastPage) || old.getBoundingClientRect().top <= -100) return
+    if(isFetching || (lastPage && page > lastPage) || oldChats.getBoundingClientRect().top <= -100) return
     isFetching = true
     const data = await fetchMessages()
     displayFetchedMessages(data)
     isFetching = false
+  }
+
+  async function handleSubmit(){
+    if (message.trim() === '') return
+    await router.post('/chat', { message })
+    message = ''
   }
 
 
@@ -64,15 +115,22 @@
 <div class="container">
   <h1 class="title">Chatroom</h1>
   <div class="chats" bind:this={chatbox} on:scroll={handleScrollFetch}>
-    <div class="old" bind:this={old}></div>
-    <div class="new"></div>
+    {#if lastPage && page > lastPage}
+      <em>No more messages!</em>
+    {/if}
+    <div class="old" bind:this={oldChats}></div>
+    <div class="newChat" bind:this={newChats}></div>
   </div>
-
+  <form on:submit|preventDefault={handleSubmit}>
+    <input type="text" bind:value={message} placeholder="Enter your message" />
+  </form>
   <a href="/" use:inertia>Go back to homepage</a>
 </div>
 
 <style>
   .chats{
+    display: flex;
+    flex-direction: column;
     height: 40vh;
     width: min(80vw, 600px);
     border: 1px solid red;
@@ -90,10 +148,21 @@
     gap: .5rem;
     padding: .5rem 0;
     align-items: flex-start;
+    word-break: break-word;
   }
 
   :global(.chats small){
     white-space: nowrap;
     margin-top: .2rem;
+  }
+
+  em{
+    text-align: center;
+  }
+
+  input{
+    width: min(80vw, 600px);
+    padding: 0.5rem 1rem;
+    margin: 1rem;
   }
 </style>

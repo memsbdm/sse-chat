@@ -30,6 +30,9 @@ export default class LoginController {
       mercure: { subscribe: ['/chat'] },
     })
 
-    return response.plainCookie('sseAuthorization', token, { encode: false }).redirect().toPath('/')
+    return response
+      .plainCookie('mercureAuthorization', token, { encode: false })
+      .redirect()
+      .toPath('/')
   }
 }

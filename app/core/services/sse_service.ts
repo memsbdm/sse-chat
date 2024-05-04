@@ -9,7 +9,7 @@ export class SseService {
       jws
         .createSign({
           payload,
-          secret: 'Change',
+          secret: process.env.MERCURE_JWT_SECRET,
           header: { alg: 'HS256' },
         })
         .on('error', reject)
@@ -20,8 +20,7 @@ export class SseService {
   update(topic: string, data: Record<string, string>, isPrivate: boolean = false) {
     return got.post(MERCURE_URL, {
       headers: {
-        'Authorization':
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdfX0.AB41HncCySxtaC7Af_z754a1buI8dwtvvc7XK7x3BSQ',
+        'Authorization': `Bearer ${process.env.MERCURE_SERVER_JWT!}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: querystring
